@@ -1,0 +1,62 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "title": "Expectations and Notifications",
+    "description": "Specifies which trips users are expected to label and when they should be reminded to do so",
+    "type": "object",
+    "properties": {
+        "intensiveMode": {
+            "description": "Describes when the primary (intensive) mode is active; omit to disable primary/secondary modes",
+            "type": "object",
+            "properties": {
+                "startDate": {
+                    "description": "The base date from which to measure time",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "recurrenceUnit": {
+                    "description": "The units for recurrenceValue",
+                    "type": "string",
+                    "enum": ["day", "week", "month"]
+                },
+                "recurrenceValue": {
+                    "description": "How often the intensive mode recurs",
+                    "type": "integer"
+                },
+                "duration": {
+                    "description": "How long the intensive mode lasts in days",
+                    "type": "integer"
+                }
+            },
+            "required": ["startDate", "recurrenceUnit", "recurrenceValue", "duration"]
+        },
+        "modes": {
+            "description": "The various modes we can be in and their specifications",
+            "type": "object",
+            "properties": {
+                "intensive": {
+                    "description": "Intensive (primary) mode, iff intensiveMode is defined at the top level",
+                    "$ref": "#/definitions/mode"
+                },
+                "default": {
+                    "description": "Relaxed (secondary) mode if intensiveMode is defined at the top level, otherwise the mode we are always in",
+                    "$ref": "#/definitions/mode"
+                }
+            }
+        }
+    },
+    "required": ["modes"],
+    "dependencies": {
+        "intensiveMode": {
+            "properties": {
+                "modes": {
+                    "required": ["intensive"]
+                }
+            }
+        }
+    },
+    "definitions": {
+        "mode": {
+            "type": "object"
+        }
+    }
+}
