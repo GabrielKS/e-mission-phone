@@ -1,12 +1,14 @@
 {
-    "intensiveMode": {
-        "startDate": "2021-09-01T20:00:00.000-00:00",
-        "recurrenceUnit": "month",
-        "recurrenceValue": 1,
-        "duration": 7
-    },
-    "modes": {
-        "intensive": {
+    "$schema": "./expectationsSchema.json",
+    "modes": [
+        {
+            "label": "intensive",
+            "schedule": {
+                "startDate": "2021-09-01T20:00:00.000-00:00",
+                "recurrenceUnit": "month",
+                "recurrenceValue": 1,
+                "duration": 7
+            },
             "confidenceThreshold": 0.65,
             "rules": [
                 {
@@ -24,8 +26,8 @@
                         "type": "all"
                     },
                     "notify": {
-                        "type": "weekday",
-                        "value": "Friday"
+                        "type": "weekDay",
+                        "value": 5
                     }
                 },
                 {
@@ -39,7 +41,8 @@
                 }
             ]
         },
-        "default": {
+        {
+            "label": "relaxed",
             "confidenceThreshold": 0.55,
             "rules": [
                 {
@@ -55,9 +58,6 @@
                 {
                     "trigger": 1,
                     "expect": {
-                        "type": "none"
-                    },
-                    "notify": {
                         "type": "none"
                     }
                 },
@@ -83,5 +83,5 @@
                 }
             ]
         }
-    }
+    ]
 }
