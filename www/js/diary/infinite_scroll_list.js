@@ -17,7 +17,8 @@ angular.module('emission.main.diary.infscrolllist',['ui-leaflet',
                                       'ng-walkthrough', 'nzTour', 'emission.plugin.kvstore',
                                       'emission.main.diary.infscrollfilters',
                                       'emission.stats.clientstats',
-                                      'emission.plugin.logger'])
+                                      'emission.plugin.logger',
+                                      'emission.expectations.config'])
 
 .controller("InfiniteDiaryListCtrl", function($window, $scope, $rootScope, $ionicPlatform, $state,
                                     $ionicScrollDelegate, $ionicPopup, ClientStats,
@@ -26,7 +27,7 @@ angular.module('emission.main.diary.infscrolllist',['ui-leaflet',
                                     ionicDatePicker,
                                     leafletData, Timeline, CommonGraph, DiaryHelper,
                                     InfScrollFilters,
-    Config, PostTripManualMarker, ConfirmHelper, nzTour, KVStore, Logger, UnifiedDataLoader, $ionicPopover, $ionicModal, $translate) {
+    Config, PostTripManualMarker, ConfirmHelper, nzTour, KVStore, Logger, UnifiedDataLoader, $ionicPopover, $ionicModal, $translate, ExpectationHelper) {
 
   // TODO: load only a subset of entries instead of everything
 
@@ -75,7 +76,16 @@ angular.module('emission.main.diary.infscrolllist',['ui-leaflet',
                 $scope.populateManualInputs(trip, ctList[tIndex+1], item, $scope.data.manualResultMap[item]);
             });
             trip.finalInference = {};
+            trip.finalInferenceConfidence = {};
             $scope.inferFinalLabels(trip);
+            console.log("cii");
+            //Temporary, for testing:
+            ExpectationHelper.getExpectationAndNotification(trip).then((output) => {
+              console.log(JSON.stringify(trip.finalInference));
+              console.log(JSON.stringify(trip.finalInferenceConfidence));
+              console.log(JSON.stringify(output));
+              console.log();
+            });
         });
         ctList.forEach(function(trip, index) {
             fillPlacesForTripAsync(trip);
@@ -324,7 +334,10 @@ angular.module('emission.main.diary.infscrolllist',['ui-leaflet',
 
       // Red labels if we have no possibilities left
       if (labelsList.length == 0) {
-        for (const inputType of ConfirmHelper.INPUTS) $scope.populateInput(trip.finalInference, inputType, undefined);
+        for (const inputType of ConfirmHelper.INPUTS) {
+          $scope.populateInput(trip.finalInference, inputType, undefined);
+          trip.finalInferenceConfidence[inputType] = undefined;
+        }
       }
       else {
         // Normalize probabilities to previous level of certainty
@@ -350,6 +363,7 @@ angular.module('emission.main.diary.infscrolllist',['ui-leaflet',
           if (max.p <= confidenceThreshold) max.labelValue = undefined;
 
           $scope.populateInput(trip.finalInference, inputType, max.labelValue);
+          trip.finalInferenceConfidence[inputType] = max.p
         }
       }
       $scope.updateVerifiability(trip);

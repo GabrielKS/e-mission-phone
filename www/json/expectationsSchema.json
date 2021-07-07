@@ -36,6 +36,11 @@
                     "minimum": 0,
                     "maximum": 1
                 },
+                "draftDelay": {
+                    "description": "Avoid processing new draft trips for this number of hours, then, if they still have not been confirmed, treat them as if they have all red labels",
+                    "type": "number",
+                    "minimum": 0
+                },
                 "schedule": {
                     "$ref": "#/definitions/scheduleType"
                 },
@@ -61,7 +66,7 @@
                     ]
                 }
             },
-            "required": ["label", "confidenceThreshold", "rules"]
+            "required": ["label", "confidenceThreshold", "draftDelay", "rules"]
         },
         "scheduleType": {
             "description": "Describes when the mode is active; omit to make always active",
@@ -75,7 +80,7 @@
                 "recurrenceUnit": {
                     "description": "The units for recurrenceValue",
                     "type": "string",
-                    "enum": ["day", "week", "month"]
+                    "enum": ["days", "weeks", "months"]
                 },
                 "recurrenceValue": {
                     "description": "How often the mode recurs",
@@ -169,9 +174,9 @@
             "type": "object",
             "properties": {
                 "type": {
-                    "description": "\"tripEnd\": notify at the end of each trip\n\"dayEnd\": notify at the end of each day\n\"nDays\": notify every certain number of days\n\"weekDay\": notify on a certain day of the week\n\"none\": do not notify",
+                    "description": "\"immediately\": notify as soon as the label data comes in\n\"dayEnd\": notify at the end of each day\n\"nDays\": notify every certain number of days\n\"weekDay\": notify on a certain day of the week\n\"none\": do not notify",
                     "type": "string",
-                    "enum": ["tripEnd", "dayEnd", "nDays", "weekDay", "none"]
+                    "enum": ["immediately", "dayEnd", "nDays", "weekDay", "none"]
                 },
                 "value": {
                     "$comment": "If \"type\" is \"nDays\": this is the number [1, Infinity) of days we wait in between notifications\nIf \"type\" is \"weekDay\": this is the number of the day [1=Monday, 7=Sunday] on which we notify"
@@ -179,7 +184,7 @@
             },
             "allOf": [
                 {
-                    "if": {"properties": {"type": {"enum": ["tripEnd", "dayEnd", "none"]}}},
+                    "if": {"properties": {"type": {"enum": ["immediately", "dayEnd", "none"]}}},
                     "then": {"not": {"required": ["value"]}}
                 },
                 {
